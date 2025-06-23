@@ -1,5 +1,6 @@
 class Api::V1::ChallengesController < ApplicationController
-  before_action :set_id, only: [ :show, :update, :destroy ]
+  before_action :authenticate_user!, only: %i[create update destroy]
+  before_action :set_id, only: %i[ show update destroy ]
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
 
   # GET /api/v1/challenges
@@ -10,7 +11,7 @@ class Api::V1::ChallengesController < ApplicationController
 
   # POST /api/v1/challenges
   def create
-    @challenge = Challenge.new(challenge_params)
+    @challenge = current_user.challenges.build(challenge_params)
 
     if @challenge.save
       render json: { message: "Success", data: @challenge }
