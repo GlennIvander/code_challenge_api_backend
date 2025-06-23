@@ -1,6 +1,7 @@
 class Api::V1::ChallengesController < ApplicationController
   before_action :authenticate_user!, only: %i[create update destroy]
   before_action :set_id, only: %i[ show update destroy ]
+  before_action :authorize_admin, only: %i[create update destroy]
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
 
   # GET /api/v1/challenges
@@ -53,6 +54,10 @@ class Api::V1::ChallengesController < ApplicationController
 
   def set_id
     @challenge = Challenge.find(params[:id])
+  end
+
+  def authorize_admin
+    render json: { message: "forbidden action" } unless current_user.email == ENV["ADMIN_EMAIL"]
   end
 
   def record_not_found
